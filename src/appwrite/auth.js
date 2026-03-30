@@ -54,9 +54,6 @@ export class AuthService{
         }
     }
 
-    async hi(){
-        
-    }
     
 }
 
