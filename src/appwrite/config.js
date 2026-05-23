@@ -147,7 +147,11 @@ export class Service {
               return this.mapDocument(res);
             } catch (err) {
               const msg = err?.message || "";
-              if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+              if (
+                msg.includes("Unknown attribute") ||
+                msg.includes("Attribute not found") ||
+                msg.includes("Missing required attribute")
+              ) {
                 continue;
               }
               throw err;
@@ -176,7 +180,11 @@ export class Service {
             return this.mapDocument(res);
           } catch (err) {
             const msg = err?.message || "";
-            if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+            if (
+              msg.includes("Unknown attribute") ||
+              msg.includes("Attribute not found") ||
+              msg.includes("Missing required attribute")
+            ) {
               continue;
             }
             throw err;
