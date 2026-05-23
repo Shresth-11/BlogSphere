@@ -51,16 +51,16 @@ export default function PostForm({ post }) {
     setError("");
     try {
       if (post) {
+        if (data.image[0]) {
+          await appwriteService.deleteFile(post.featuredImage || post.$id);
+        }
+
         const file = data.image[0]
-          ? await appwriteService.uploadFile(data.image[0])
+          ? await appwriteService.uploadFile(data.image[0], post.$id)
           : null;
 
         if (data.image[0] && !file) {
           throw new Error("Failed to upload the new featured image to Appwrite Storage. Please check file permissions.");
-        }
-
-        if (file) {
-          appwriteService.deleteFile(post.featuredImage);
         }
 
         const dbPost = await appwriteService.updatePost(post.$id, {
@@ -72,7 +72,8 @@ export default function PostForm({ post }) {
           navigate(`/post/${dbPost.$id}`);
         }
       } else {
-        const file = await appwriteService.uploadFile(data.image[0]);
+        const slug = data.slug || getValues("slug") || slugTransform(data.title);
+        const file = await appwriteService.uploadFile(data.image[0], slug);
 
         if (file) {
           const fileId = file.$id;
@@ -80,6 +81,7 @@ export default function PostForm({ post }) {
           console.log("PostForm :: submit :: Submitting with userData:", userData);
           const dbPost = await appwriteService.createPost({
             ...data,
+            slug,
             userId: userData ? (userData.$id || userData.uid || userData.id || userData.userId) : undefined,
             author: userData ? (userData.name || userData.username || userData.email) : undefined,
           });

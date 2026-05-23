@@ -36,11 +36,17 @@ export class Service {
         "postimage",
         "post_image"
       ];
+      let foundImage = false;
       for (const key of imageKeys) {
         if (doc[key] !== undefined && doc[key] !== null) {
           doc.featuredImage = doc[key];
+          foundImage = true;
           break;
         }
+      }
+      if (!foundImage) {
+        // Fallback to the document's own $id as the image ID
+        doc.featuredImage = doc.$id;
       }
 
       // 2. Map author
@@ -364,15 +370,15 @@ export class Service {
 
   // file upload service
 
-  async uploadFile(file) {
+  async uploadFile(file, fileId = ID.unique()) {
     try {
       return await this.bucket.createFile(
         conf.appwriteBucketId,
-        ID.unique(),
+        fileId,
         file,
       );
     } catch (error) {
-      console.log("Appwrite service :: uploadFile :: error", error);
+      console.log("Appwrite service :: uploadFile :: error", error, "for fileId:", fileId);
       return false;
     }
   }
