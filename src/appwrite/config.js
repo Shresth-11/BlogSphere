@@ -72,7 +72,7 @@ export class Service {
   }
 
   async createPost({ title, slug, content, featuredImage, status, userId, author }) {
-    let payload = { title, slug, content, featuredImage, status, userId, author };
+    let payload = { title, content, featuredImage, status, userId, author };
     try {
       const res = await this.databases.createDocument(
         conf.appwriteDatabaseId,
@@ -101,7 +101,7 @@ export class Service {
         }
       }
       
-      return await this.handleCreateErrorFallback(error, payload);
+      return await this.handleCreateErrorFallback(error, { ...payload, slug });
     }
   }
 
