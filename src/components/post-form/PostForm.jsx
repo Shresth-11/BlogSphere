@@ -52,10 +52,11 @@ export default function PostForm({ post }) {
         if (file) {
           const fileId = file.$id;
           data.featuredImage = fileId;
+          console.log("PostForm :: submit :: Submitting with userData:", userData);
           const dbPost = await appwriteService.createPost({
             ...data,
-            userId: userData.$id,
-            author: userData.name,
+            userId: userData ? (userData.$id || userData.uid || userData.id || userData.userId) : undefined,
+            author: userData ? (userData.name || userData.username || userData.email) : undefined,
           });
 
           if (dbPost) {

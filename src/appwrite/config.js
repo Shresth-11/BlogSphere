@@ -1,10 +1,11 @@
 import conf from "../conf/conf";
-import { Client, ID, Databases, Storage, Query } from "appwrite";
+import { Client, ID, Databases, Storage, Query, Account } from "appwrite";
 
 export class Service {
   client = new Client();
   databases;
   bucket;
+  account;
 
   constructor() {
     this.client
@@ -13,6 +14,7 @@ export class Service {
 
     this.databases = new Databases(this.client);
     this.bucket = new Storage(this.client);
+    this.account = new Account(this.client);
   }
 
   mapDocument(doc) {
@@ -64,6 +66,25 @@ export class Service {
 
   async createPost({ title, slug, content, featuredImage, status, userId, author }) {
     console.log("Appwrite service :: createPost :: Starting adaptive write...", { title, slug, featuredImage, status, userId, author });
+
+    // Try to dynamically retrieve userId and author from session if missing
+    if (!userId || !author) {
+      try {
+        const user = await this.account.get();
+        if (user) {
+          if (!userId && user.$id) {
+            userId = user.$id;
+            console.log("Appwrite service :: createPost :: Dynamically retrieved missing userId from session:", userId);
+          }
+          if (!author && user.name) {
+            author = user.name;
+            console.log("Appwrite service :: createPost :: Dynamically retrieved missing author from session:", author);
+          }
+        }
+      } catch (authErr) {
+        console.error("Appwrite service :: createPost :: Failed to dynamically fetch user session", authErr);
+      }
+    }
 
     // Try a direct write with the standard schema payload first
     try {
