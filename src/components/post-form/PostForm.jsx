@@ -105,11 +105,18 @@ export default function PostForm({ post }) {
       
       {/* Dynamic Error Notification Banner */}
       {error && (
-        <div className="w-full p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm font-semibold flex items-start gap-3 backdrop-blur-md animate-pulse text-left shadow-lg shadow-rose-950/20">
-          <span className="text-lg leading-none mt-0.5">⚠️</span>
-          <div className="flex flex-col gap-1">
-            <span className="text-white font-bold">Failed to publish article</span>
-            <span className="text-xs text-rose-300/80 leading-normal">{error}</span>
+        <div className="w-full p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm font-semibold flex flex-col gap-2 backdrop-blur-md text-left shadow-lg shadow-rose-950/20">
+          <div className="flex items-start gap-3">
+            <span className="text-lg leading-none mt-0.5">⚠️</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-white font-bold">Failed to publish article</span>
+              <span className="text-xs text-rose-300/80 leading-normal">{error}</span>
+            </div>
+          </div>
+          <div className="text-[10px] text-rose-400/80 border-t border-rose-500/25 pt-2 pl-8 flex flex-col gap-1">
+            <span className="font-bold uppercase tracking-wider text-rose-300">🔍 Diagnostics:</span>
+            <span>• Redux User State: {userData ? JSON.stringify(userData) : "null / undefined"}</span>
+            <span>• Resolved userId: {userData ? (userData.$id || userData.uid || userData.id || userData.userId || "NOT RESOLVED") : "NO USERDATA"}</span>
           </div>
         </div>
       )}
