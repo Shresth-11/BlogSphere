@@ -60,6 +60,13 @@ export class Service {
           break;
         }
       }
+
+      // 4. Map status to frontend-expected active/inactive values
+      if (doc.status === "published") {
+        doc.status = "active";
+      } else if (doc.status === "draft") {
+        doc.status = "inactive";
+      }
     }
     return doc;
   }
@@ -131,7 +138,37 @@ export class Service {
           throw new Error("Appwrite rate limit exceeded. Please wait a few seconds and try again.");
         }
 
-        // 2. Check if the error tells us about an unknown attribute we sent
+        // 2. Check if the error is due to status enum mismatch
+        const statusMatch = errorMsg.match(/Attribute\s*"status"\s*has\s*invalid\s*format.*Value\s*must\s*be\s*one\s*of\s*\(([^)]+)\)/i);
+        if (statusMatch && statusMatch[1]) {
+          const allowed = statusMatch[1].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+          console.log(`Appwrite service :: createPost :: Status enum mismatch. Allowed values:`, allowed);
+          
+          if (payload.status === "active") {
+            if (allowed.includes("published")) {
+              payload.status = "published";
+            } else if (allowed.includes("draft")) {
+              payload.status = "draft";
+            } else {
+              payload.status = allowed[0];
+            }
+          } else if (payload.status === "inactive") {
+            if (allowed.includes("draft")) {
+              payload.status = "draft";
+            } else if (allowed.includes("archived")) {
+              payload.status = "archived";
+            } else {
+              payload.status = allowed[0];
+            }
+          } else {
+            payload.status = allowed[0];
+          }
+          
+          console.log(`Appwrite service :: createPost :: Remapped status to database enum value: "${payload.status}"`);
+          continue; // Retry with modified payload
+        }
+
+        // 3. Check if the error tells us about an unknown attribute we sent
         const unknownMatch = errorMsg.match(/Unknown attribute:\s*"([^"]+)"/) || errorMsg.match(/attribute\s*"([^"]+)"\s*is\s*unknown/i) || errorMsg.match(/attribute\s*"([^"]+)"\s*not\s*found/i);
         if (unknownMatch && unknownMatch[1]) {
           const unknownKey = unknownMatch[1];
@@ -164,7 +201,7 @@ export class Service {
           continue; // Retry with modified payload
         }
 
-        // 3. Check if it tells us about a missing required attribute that we forgot to send
+        // 4. Check if it tells us about a missing required attribute that we forgot to send
         const missingMatch = errorMsg.match(/Missing required attribute\s*"([^"]+)"/) || errorMsg.match(/attribute\s*"([^"]+)"\s*is\s*required/i);
         if (missingMatch && missingMatch[1]) {
           const requiredKey = missingMatch[1];
@@ -230,6 +267,22 @@ export class Service {
           throw new Error("Appwrite rate limit exceeded. Please wait a few seconds and try again.");
         }
 
+        // Check if status enum mismatch occurs during update
+        const statusMatch = errorMsg.match(/Attribute\s*"status"\s*has\s*invalid\s*format.*Value\s*must\s*be\s*one\s*of\s*\(([^)]+)\)/i);
+        if (statusMatch && statusMatch[1]) {
+          const allowed = statusMatch[1].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+          console.log(`Appwrite service :: updatePost :: Status enum mismatch. Allowed values:`, allowed);
+          
+          if (payload.status === "active") {
+            payload.status = allowed.includes("published") ? "published" : (allowed.includes("draft") ? "draft" : allowed[0]);
+          } else if (payload.status === "inactive") {
+            payload.status = allowed.includes("draft") ? "draft" : (allowed.includes("archived") ? "archived" : allowed[0]);
+          } else {
+            payload.status = allowed[0];
+          }
+          continue;
+        }
+
         const unknownMatch = errorMsg.match(/Unknown attribute:\s*"([^"]+)"/) || errorMsg.match(/attribute\s*"([^"]+)"\s*is\s*unknown/i) || errorMsg.match(/attribute\s*"([^"]+)"\s*not\s*found/i);
         if (unknownMatch && unknownMatch[1]) {
           const unknownKey = unknownMatch[1];
@@ -284,10 +337,20 @@ export class Service {
 
   async getPosts(queries = [Query.equal("status", "active")]) {
     try {
+      const mappedQueries = queries.map(q => {
+        if (typeof q === "string") {
+          // Rewrite status query to target both active and published statuses
+          if (q.includes('equal("status", ["active"])') || q.includes('equal("status", "active")')) {
+            return 'equal("status", ["active", "published"])';
+          }
+        }
+        return q;
+      });
+
       const res = await this.databases.listDocuments(
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
-        queries,
+        mappedQueries,
       );
       if (res && res.documents) {
         res.documents = res.documents.map((doc) => this.mapDocument(doc));
