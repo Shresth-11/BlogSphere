@@ -32,6 +32,36 @@ export class Service {
       );
     } catch (error) {
       console.log("Appwrite service :: createPost :: error", error);
+      
+      // Auto-fallback: If Appwrite collection doesn't have the 'author' attribute,
+      // retry the document creation without passing 'author' in the document body.
+      const errorMsg = error?.message || "";
+      if (
+        errorMsg.includes("Attribute not found") || 
+        errorMsg.includes("author") || 
+        errorMsg.includes("invalid") ||
+        errorMsg.includes("validation")
+      ) {
+        console.log("Appwrite service :: createPost :: Retrying document creation without author attribute...");
+        try {
+          return await this.databases.createDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionId,
+            slug,
+            {
+              title,
+              content,
+              featuredImage,
+              status,
+              userId,
+            },
+          );
+        } catch (retryError) {
+          console.log("Appwrite service :: createPost :: retry failed", retryError);
+          throw retryError;
+        }
+      }
+      throw error;
     }
   }
 
@@ -50,6 +80,7 @@ export class Service {
       );
     } catch (error) {
       console.log("Appwrite service :: updatePost :: error", error);
+      throw error;
     }
   }
 
