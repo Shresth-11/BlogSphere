@@ -30,6 +30,10 @@ export default function PostForm({ post }) {
           ? await appwriteService.uploadFile(data.image[0])
           : null;
 
+        if (data.image[0] && !file) {
+          throw new Error("Failed to upload the new featured image to Appwrite Storage. Please check file permissions.");
+        }
+
         if (file) {
           appwriteService.deleteFile(post.featuredImage);
         }
@@ -57,6 +61,8 @@ export default function PostForm({ post }) {
           if (dbPost) {
             navigate(`/post/${dbPost.$id}`);
           }
+        } else {
+          throw new Error("Failed to upload the featured image to Appwrite Storage. Please check file permissions or size.");
         }
       }
     } catch (err) {
