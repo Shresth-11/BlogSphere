@@ -52,6 +52,10 @@ export default function Post() {
               src={appwriteService.getFilePreview(post.featuredImage)}
               alt={post.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+              }}
             />
             {/* Visual gradient vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />

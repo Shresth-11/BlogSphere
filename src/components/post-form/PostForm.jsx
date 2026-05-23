@@ -21,6 +21,31 @@ export default function PostForm({ post }) {
   const [loading, setLoading] = useState(false);
   const userData = useSelector((state) => state.auth.userData);
 
+  const toFriendlyUserError = (err) => {
+    const msg = err?.message || "";
+    
+    if (msg.includes("Missing required attribute") || msg.includes("required attribute") || msg.includes("structure")) {
+      return "Some required information is missing or configured incorrectly in the database. Please ensure the Title, Content, and Status are filled out and try again.";
+    }
+    if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+      return "We encountered a database column mapping mismatch. Our system is auto-adapting; please click Publish again in a second.";
+    }
+    if (msg.includes("Rate limit") || msg.includes("rate_limit") || msg.includes("Too Many Requests")) {
+      return "You're publishing articles extremely fast! Appwrite has placed a temporary rate limit. Please wait 10 seconds and click Publish again.";
+    }
+    if (msg.includes("unauthorized") || msg.includes("401") || msg.includes("User is not authorized")) {
+      return "Your login session has expired. Please log out, sign in again, and your article will be published successfully.";
+    }
+    if (msg.includes("Network Error") || msg.includes("Failed to fetch") || msg.includes("NetworkRequestError")) {
+      return "Unable to connect to the server. Please check your internet connection and try publishing again.";
+    }
+    if (msg.includes("file permissions") || msg.includes("Storage") || msg.includes("upload")) {
+      return "Unable to upload your featured image. Please ensure your image is under 5MB and is a valid JPG/PNG/GIF file.";
+    }
+    
+    return msg || "We were unable to publish your article due to a temporary database communication issue. Please review your details and try again.";
+  };
+
   const submit = async (data) => {
     setLoading(true);
     setError("");
@@ -68,10 +93,7 @@ export default function PostForm({ post }) {
       }
     } catch (err) {
       console.error("PostForm error :: submit ::", err);
-      setError(
-        err?.message || 
-        "Failed to publish the article. Please ensure your backend services are active and your inputs are correct."
-      );
+      setError(toFriendlyUserError(err));
     } finally {
       setLoading(false);
     }
