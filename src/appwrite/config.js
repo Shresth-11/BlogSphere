@@ -388,7 +388,15 @@ export class Service {
   }
 
   getFilePreview(fileId) {
-    return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+    if (!fileId || typeof fileId !== "string" || fileId.trim() === "") {
+      return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+    }
+    try {
+      return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+    } catch (e) {
+      console.warn("Appwrite service :: getFilePreview :: error", e);
+      return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+    }
   }
 }
 
