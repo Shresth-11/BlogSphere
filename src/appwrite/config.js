@@ -17,148 +17,261 @@ export class Service {
 
   mapDocument(doc) {
     if (doc) {
-      doc.featuredImage = doc.featuredImage || doc.featuredimage || doc.featured_image || doc.image;
+      // 1. Map image
+      const imageKeys = [
+        "featuredImage",
+        "featuredimage",
+        "featured_image",
+        "featureImage",
+        "featureimage",
+        "feature_image",
+        "featuredimg",
+        "featureimg",
+        "image",
+        "img",
+        "thumbnail",
+        "postImage",
+        "postimage",
+        "post_image"
+      ];
+      for (const key of imageKeys) {
+        if (doc[key] !== undefined && doc[key] !== null) {
+          doc.featuredImage = doc[key];
+          break;
+        }
+      }
+
+      // 2. Map author
+      const authorKeys = ["author", "authorName", "userName", "name"];
+      for (const key of authorKeys) {
+        if (doc[key] !== undefined && doc[key] !== null) {
+          doc.author = doc[key];
+          break;
+        }
+      }
+
+      // 3. Map userId
+      const userIdKeys = ["userId", "userid", "user_id"];
+      for (const key of userIdKeys) {
+        if (doc[key] !== undefined && doc[key] !== null) {
+          doc.userId = doc[key];
+          break;
+        }
+      }
     }
     return doc;
   }
 
-  async handleCreateErrorFallback(error, { title, slug, content, featuredImage, status, userId }) {
-    const errorMsg = error?.message || "";
-    if (errorMsg.includes("featuredImage") || errorMsg.includes("featuredimage") || errorMsg.includes("featured_image") || errorMsg.includes("image")) {
-      // Attempt 1: Try lowercase 'featuredimage'
-      console.log("Appwrite service :: createPost :: Retrying with lowercase 'featuredimage'...");
-      try {
-        const res = await this.databases.createDocument(
-          conf.appwriteDatabaseId,
-          conf.appwriteCollectionId,
-          slug,
-          { title, content, featuredimage: featuredImage, status, userId }
-        );
-        return this.mapDocument(res);
-      } catch (err1) {
-        console.log("Appwrite service :: createPost :: lowercase 'featuredimage' failed", err1);
-        
-        // Attempt 2: Try underscore 'featured_image'
-        console.log("Appwrite service :: createPost :: Retrying with underscore 'featured_image'...");
-        try {
-          const res = await this.databases.createDocument(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionId,
-            slug,
-            { title, content, featured_image: featuredImage, status, userId }
-          );
-          return this.mapDocument(res);
-        } catch (err2) {
-          console.log("Appwrite service :: createPost :: underscore 'featured_image' failed", err2);
-          
-          // Attempt 3: Try simple 'image'
-          console.log("Appwrite service :: createPost :: Retrying with 'image'...");
-          try {
-            const res = await this.databases.createDocument(
-              conf.appwriteDatabaseId,
-              conf.appwriteCollectionId,
-              slug,
-              { title, content, image: featuredImage, status, userId }
-            );
-            return this.mapDocument(res);
-          } catch (err3) {
-            console.log("Appwrite service :: createPost :: simple 'image' failed", err3);
-            throw err3;
-          }
-        }
-      }
-    }
-    throw error;
-  }
-
   async createPost({ title, slug, content, featuredImage, status, userId, author }) {
-    let payload = { title, content, featuredImage, status, userId, author };
+    console.log("Appwrite service :: createPost :: Starting adaptive write...", { title, slug, featuredImage, status, userId, author });
+
+    // Try a direct write with the standard schema payload first
     try {
       const res = await this.databases.createDocument(
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
         slug,
-        payload
+        { title, content, featuredImage, status, userId, author }
       );
+      console.log("Appwrite service :: createPost :: Standard write succeeded.");
       return this.mapDocument(res);
     } catch (error) {
-      console.log("Appwrite service :: createPost :: error", error);
-      const errorMsg = error?.message || "";
+      console.log("Appwrite service :: createPost :: Standard write failed. Initiating discovery...", error);
       
-      // Fallback: If missing 'author' attribute, retry without it but keep primary featuredImage
-      if (errorMsg.includes("author") || errorMsg.includes("Attribute not found")) {
-        console.log("Appwrite service :: createPost :: Retrying without 'author'...");
+      const imageCandidates = [
+        "featuredImage",
+        "featuredimage",
+        "featured_image",
+        "featureImage",
+        "featureimage",
+        "feature_image",
+        "featuredimg",
+        "featureimg",
+        "image",
+        "img",
+        "thumbnail",
+        "postImage",
+        "postimage",
+        "post_image"
+      ];
+
+      const authorCandidates = ["author", "authorName", "userName", "name"];
+      const userIdCandidates = ["userId", "userid", "user_id"];
+
+      // Let's do a programmatic search
+      for (const imgKey of imageCandidates) {
+        for (const authKey of authorCandidates) {
+          for (const uIdKey of userIdCandidates) {
+            try {
+              console.log(`Appwrite service :: createPost :: Trying key combination: { image: "${imgKey}", author: "${authKey}", userId: "${uIdKey}" }`);
+              const payload = {
+                title,
+                content,
+                [imgKey]: featuredImage,
+                status,
+                [uIdKey]: userId,
+                [authKey]: author
+              };
+              const res = await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
+                slug,
+                payload
+              );
+              console.log(`Appwrite service :: createPost :: Success using { image: "${imgKey}", author: "${authKey}", userId: "${uIdKey}" }`);
+              return this.mapDocument(res);
+            } catch (err) {
+              const msg = err?.message || "";
+              if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+                continue;
+              }
+              throw err;
+            }
+          }
+        }
+
+        // Try WITHOUT author
+        for (const uIdKey of userIdCandidates) {
+          try {
+            console.log(`Appwrite service :: createPost :: Trying key combination: { image: "${imgKey}", userId: "${uIdKey}" } (NO author)`);
+            const payload = {
+              title,
+              content,
+              [imgKey]: featuredImage,
+              status,
+              [uIdKey]: userId
+            };
+            const res = await this.databases.createDocument(
+              conf.appwriteDatabaseId,
+              conf.appwriteCollectionId,
+              slug,
+              payload
+            );
+            console.log(`Appwrite service :: createPost :: Success using { image: "${imgKey}", userId: "${uIdKey}" } without author`);
+            return this.mapDocument(res);
+          } catch (err) {
+            const msg = err?.message || "";
+            if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+              continue;
+            }
+            throw err;
+          }
+        }
+      }
+
+      // If all attempts with image keys failed, try writing with NO image key at all
+      console.log("Appwrite service :: createPost :: All image candidates failed. Trying with NO image attribute...");
+      
+      for (const uIdKey of userIdCandidates) {
         try {
+          const payload = { title, content, status, [uIdKey]: userId };
           const res = await this.databases.createDocument(
             conf.appwriteDatabaseId,
             conf.appwriteCollectionId,
             slug,
-            { title, content, featuredImage, status, userId }
+            payload
           );
+          console.log("Appwrite service :: createPost :: Successfully created document with NO image key. Returned keys:", Object.keys(res));
           return this.mapDocument(res);
-        } catch (retryError) {
-          return await this.handleCreateErrorFallback(retryError, { title, slug, content, featuredImage, status, userId });
+        } catch (lastErr) {
+          console.log("Appwrite service :: createPost :: Write with NO image key failed.", lastErr);
+          const lastMsg = lastErr?.message || "";
+          
+          // E.g., "Invalid document structure: Missing required attribute "featuredImage""
+          const match = lastMsg.match(/Missing required attribute "([^"]+)"/) || lastMsg.match(/attribute "([^"]+)" is required/i);
+          if (match && match[1]) {
+            const requiredKey = match[1];
+            console.log(`Appwrite service :: createPost :: Dynamically identified required attribute from error: "${requiredKey}". Retrying write...`);
+            try {
+              const res = await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
+                slug,
+                { title, content, [requiredKey]: featuredImage, status, [uIdKey]: userId }
+              );
+              return this.mapDocument(res);
+            } catch (finalRetryErr) {
+              console.error("Appwrite service :: createPost :: Final retry with identified key failed:", finalRetryErr);
+              throw finalRetryErr;
+            }
+          }
         }
       }
       
-      return await this.handleCreateErrorFallback(error, { ...payload, slug });
+      throw error;
     }
   }
 
   async updatePost(slug, { title, content, featuredImage, status }) {
+    console.log("Appwrite service :: updatePost :: Starting adaptive update...", { slug, title, featuredImage, status });
+    
+    // Try standard update first
     try {
       const res = await this.databases.updateDocument(
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
         slug,
-        {
-          title,
-          content,
-          featuredImage,
-          status,
-        },
+        { title, content, featuredImage, status }
       );
+      console.log("Appwrite service :: updatePost :: Standard update succeeded.");
       return this.mapDocument(res);
     } catch (error) {
-      console.log("Appwrite service :: updatePost :: error", error);
+      console.log("Appwrite service :: updatePost :: Standard update failed. Initiating fallback...", error);
+      
+      const imageCandidates = [
+        "featuredImage",
+        "featuredimage",
+        "featured_image",
+        "featureImage",
+        "featureimage",
+        "feature_image",
+        "featuredimg",
+        "featureimg",
+        "image",
+        "img",
+        "thumbnail",
+        "postImage",
+        "postimage",
+        "post_image"
+      ];
+
       const errorMsg = error?.message || "";
-      if (errorMsg.includes("featuredImage") || errorMsg.includes("featuredimage") || errorMsg.includes("featured_image") || errorMsg.includes("image")) {
-        // Attempt 1: Try lowercase 'featuredimage'
-        try {
-          const res = await this.databases.updateDocument(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionId,
-            slug,
-            { title, content, featuredimage: featuredImage, status }
-          );
-          return this.mapDocument(res);
-        } catch (err1) {
-          // Attempt 2: Try underscore 'featured_image'
+      if (errorMsg.includes("Unknown attribute") || errorMsg.includes("Attribute not found") || errorMsg.includes("featuredImage") || errorMsg.includes("featuredimage") || errorMsg.includes("featured_image") || errorMsg.includes("image")) {
+        for (const imgKey of imageCandidates) {
           try {
+            console.log(`Appwrite service :: updatePost :: Trying update with key: "${imgKey}"`);
             const res = await this.databases.updateDocument(
               conf.appwriteDatabaseId,
               conf.appwriteCollectionId,
               slug,
-              { title, content, featured_image: featuredImage, status }
+              { title, content, [imgKey]: featuredImage, status }
             );
+            console.log(`Appwrite service :: updatePost :: Success using key: "${imgKey}"`);
             return this.mapDocument(res);
-          } catch (err2) {
-            // Attempt 3: Try simple 'image'
-            try {
-              const res = await this.databases.updateDocument(
-                conf.appwriteDatabaseId,
-                conf.appwriteCollectionId,
-                slug,
-                { title, content, image: featuredImage, status }
-              );
-              return this.mapDocument(res);
-            } catch (err3) {
-              throw err3;
+          } catch (err) {
+            const msg = err?.message || "";
+            if (msg.includes("Unknown attribute") || msg.includes("Attribute not found")) {
+              continue;
             }
+            throw err;
           }
         }
       }
-      throw error;
+
+      // If everything failed, try update without featuredImage
+      console.log("Appwrite service :: updatePost :: All image updates failed. Trying update without image attribute...");
+      try {
+        const res = await this.databases.updateDocument(
+          conf.appwriteDatabaseId,
+          conf.appwriteCollectionId,
+          slug,
+          { title, content, status }
+        );
+        console.log("Appwrite service :: updatePost :: Successfully updated without image attribute!");
+        return this.mapDocument(res);
+      } catch (lastErr) {
+        throw error;
+      }
     }
   }
 
