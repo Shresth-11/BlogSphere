@@ -6,6 +6,8 @@
 [![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
 [![Appwrite](https://img.shields.io/badge/Appwrite-Backend-FD366E?logo=appwrite&logoColor=white)](https://appwrite.io/)
 
+🚀 **Live Demo:** [blog-sphere-eight-iota.vercel.app](https://blog-sphere-eight-iota.vercel.app/)
+
 **BlogSphere** is a premium, feature-rich, and lightning-fast modern blogging platform. It is built as a Single Page Application (SPA) leveraging **React 19**, **Vite**, **Tailwind CSS v4**, and **Redux Toolkit** for front-end structure and state management. The backend is completely powered by **Appwrite Cloud**, handling user authentication, custom database collections (for blogs), and object storage (for featured post images).
 
 ---
