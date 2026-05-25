@@ -227,6 +227,11 @@ export default function PostForm({ post }) {
                   src={appwriteService.getFilePreview(post.featuredImage)}
                   alt={post.title}
                   className="w-full rounded-xl object-cover aspect-video"
+                  onError={(e) => {
+                    console.warn(`PostForm :: Failed to load featured image preview for file ID "${post.featuredImage}". If this returned a 403 Forbidden, ensure your Appwrite Storage Bucket has 'Public Read' permissions enabled in the Appwrite Console.`);
+                    e.target.onerror = null;
+                    e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+                  }}
                 />
                 <span className="block text-center text-[10px] text-zinc-500 font-medium mt-2">
                   Current Featured Image

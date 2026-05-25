@@ -6,6 +6,12 @@ export class Service {
   databases;
   bucket;
   account;
+  schemaKeys = {
+    featuredImage: null,
+    userId: null,
+    author: null,
+    status: null
+  };
 
   constructor() {
     this.client
@@ -15,11 +21,65 @@ export class Service {
     this.databases = new Databases(this.client);
     this.bucket = new Storage(this.client);
     this.account = new Account(this.client);
+
+    // Load schema keys from localStorage if present
+    if (typeof window !== "undefined" && window.localStorage) {
+      try {
+        const cached = window.localStorage.getItem("appwrite_schema_keys");
+        if (cached) {
+          this.schemaKeys = JSON.parse(cached);
+          console.log("Appwrite service :: Loaded cached schema keys:", this.schemaKeys);
+        }
+      } catch (e) {
+        console.warn("Appwrite service :: Failed to load schema keys from localStorage:", e);
+      }
+    }
+  }
+
+  saveSchemaKeys() {
+    if (typeof window !== "undefined" && window.localStorage) {
+      try {
+        window.localStorage.setItem("appwrite_schema_keys", JSON.stringify(this.schemaKeys));
+      } catch (e) {
+        console.warn("Appwrite service :: Failed to save schema keys to localStorage:", e);
+      }
+    }
+  }
+
+  updateSchemaCacheFromPayload(payload) {
+    const imageKeys = ["featuredImage", "featuredimage", "featured_image", "featureImage", "featureimage", "feature_image", "featuredimg", "featureimg", "image", "img", "thumbnail", "postImage", "postimage", "post_image"];
+    const authorKeys = ["author", "authorName", "userName", "name"];
+    const userIdKeys = ["userId", "userid", "user_id"];
+    const statusKeys = ["status", "state", "postStatus", "poststatus"];
+    
+    let changed = false;
+    for (const key of Object.keys(payload)) {
+      if (imageKeys.includes(key) && this.schemaKeys.featuredImage !== key) {
+        this.schemaKeys.featuredImage = key;
+        changed = true;
+      }
+      if (authorKeys.includes(key) && this.schemaKeys.author !== key) {
+        this.schemaKeys.author = key;
+        changed = true;
+      }
+      if (userIdKeys.includes(key) && this.schemaKeys.userId !== key) {
+        this.schemaKeys.userId = key;
+        changed = true;
+      }
+      if (statusKeys.includes(key) && this.schemaKeys.status !== key) {
+        this.schemaKeys.status = key;
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.saveSchemaKeys();
+      console.log("Appwrite service :: Schema cache updated from payload:", this.schemaKeys);
+    }
   }
 
   mapDocument(doc) {
     if (doc) {
-      // 1. Map image
+      // 1. Map and auto-discover image
       const imageKeys = [
         "featuredImage",
         "featuredimage",
@@ -41,6 +101,11 @@ export class Service {
         if (doc[key] !== undefined && doc[key] !== null) {
           doc.featuredImage = doc[key];
           foundImage = true;
+          if (this.schemaKeys.featuredImage !== key) {
+            this.schemaKeys.featuredImage = key;
+            this.saveSchemaKeys();
+            console.log("Appwrite service :: mapDocument :: Auto-detected featuredImage key:", key);
+          }
           break;
         }
       }
@@ -49,28 +114,53 @@ export class Service {
         doc.featuredImage = doc.$id;
       }
 
-      // 2. Map author
+      // 2. Map and auto-discover author
       const authorKeys = ["author", "authorName", "userName", "name"];
       for (const key of authorKeys) {
         if (doc[key] !== undefined && doc[key] !== null) {
           doc.author = doc[key];
+          if (this.schemaKeys.author !== key) {
+            this.schemaKeys.author = key;
+            this.saveSchemaKeys();
+            console.log("Appwrite service :: mapDocument :: Auto-detected author key:", key);
+          }
           break;
         }
       }
 
-      // 3. Map userId
+      // 3. Map and auto-discover userId
       const userIdKeys = ["userId", "userid", "user_id"];
       for (const key of userIdKeys) {
         if (doc[key] !== undefined && doc[key] !== null) {
           doc.userId = doc[key];
+          if (this.schemaKeys.userId !== key) {
+            this.schemaKeys.userId = key;
+            this.saveSchemaKeys();
+            console.log("Appwrite service :: mapDocument :: Auto-detected userId key:", key);
+          }
           break;
         }
       }
 
-      // 4. Map status to frontend-expected active/inactive values
-      if (doc.status === "published") {
+      // 4. Map and auto-discover status key and map to frontend active/inactive values
+      const statusKeys = ["status", "state", "postStatus", "poststatus"];
+      let statusKey = "status";
+      for (const key of statusKeys) {
+        if (doc[key] !== undefined && doc[key] !== null) {
+          statusKey = key;
+          if (this.schemaKeys.status !== key) {
+            this.schemaKeys.status = key;
+            this.saveSchemaKeys();
+            console.log("Appwrite service :: mapDocument :: Auto-detected status key:", key);
+          }
+          break;
+        }
+      }
+
+      const currentStatus = doc[statusKey];
+      if (currentStatus === "published" || currentStatus === "active") {
         doc.status = "active";
-      } else if (doc.status === "draft") {
+      } else if (currentStatus === "draft" || currentStatus === "inactive") {
         doc.status = "inactive";
       }
     }
@@ -78,7 +168,7 @@ export class Service {
   }
 
   async createPost({ title, slug, content, featuredImage, status, userId, author }) {
-    console.log("Appwrite service :: createPost :: Starting reactive write...", { title, slug, featuredImage, status, userId, author });
+    console.log("Appwrite service :: createPost :: Starting write...", { title, slug, featuredImage, status, userId, author });
 
     // Try to dynamically retrieve userId and author from session if missing
     if (!userId || !author) {
@@ -103,15 +193,29 @@ export class Service {
     userId = userId || "user_" + ID.unique();
     author = author || "Anonymous Writer";
 
-    // Start with a clean payload containing all expected standard fields
-    let payload = {
-      title,
-      content,
-      status,
-      userId,
-      author,
-      featuredImage // standard camelCase
-    };
+    // Build optimized payload dynamically using cached schema keys first!
+    let payload = { title, content };
+
+    // Apply cached featuredImage key or default to "featuredImage"
+    const imageKey = this.schemaKeys.featuredImage || "featuredImage";
+    payload[imageKey] = featuredImage;
+
+    // Apply cached userId key or default to "userId"
+    const userIdKey = this.schemaKeys.userId || "userId";
+    payload[userIdKey] = userId;
+
+    // Apply cached author key if known
+    if (this.schemaKeys.author) {
+      payload[this.schemaKeys.author] = author;
+    } else if (this.schemaKeys.author === undefined) {
+      // Checked and found not present in schema
+    } else {
+      payload.author = author;
+    }
+
+    // Apply status key
+    const statusKey = this.schemaKeys.status || "status";
+    payload[statusKey] = status;
 
     // Clean up undefined fields
     Object.keys(payload).forEach(key => {
@@ -133,7 +237,8 @@ export class Service {
           slug,
           payload
         );
-        console.log(`Appwrite service :: createPost :: Write succeeded on attempt ${attempt}!`);
+        console.log(`Appwrite service :: createPost :: Write succeeded!`);
+        this.updateSchemaCacheFromPayload(payload);
         return this.mapDocument(res);
       } catch (error) {
         const errorMsg = error?.message || "";
@@ -150,28 +255,14 @@ export class Service {
           const allowed = statusMatch[1].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
           console.log(`Appwrite service :: createPost :: Status enum mismatch. Allowed values:`, allowed);
           
-          if (payload.status === "active") {
-            if (allowed.includes("published")) {
-              payload.status = "published";
-            } else if (allowed.includes("draft")) {
-              payload.status = "draft";
-            } else {
-              payload.status = allowed[0];
-            }
-          } else if (payload.status === "inactive") {
-            if (allowed.includes("draft")) {
-              payload.status = "draft";
-            } else if (allowed.includes("archived")) {
-              payload.status = "archived";
-            } else {
-              payload.status = allowed[0];
-            }
+          if (payload[statusKey] === "active") {
+            payload[statusKey] = allowed.includes("published") ? "published" : (allowed.includes("draft") ? "draft" : allowed[0]);
+          } else if (payload[statusKey] === "inactive") {
+            payload[statusKey] = allowed.includes("draft") ? "draft" : (allowed.includes("archived") ? "archived" : allowed[0]);
           } else {
-            payload.status = allowed[0];
+            payload[statusKey] = allowed[0];
           }
-          
-          console.log(`Appwrite service :: createPost :: Remapped status to database enum value: "${payload.status}"`);
-          continue; // Retry with modified payload
+          continue; // Retry with modified status
         }
 
         // 3. Check if the error tells us about an unknown attribute we sent
@@ -181,7 +272,6 @@ export class Service {
           console.log(`Appwrite service :: createPost :: Dynamically removing unknown attribute: "${unknownKey}"`);
           delete payload[unknownKey];
           
-          // Fallback: if 'featuredImage' (camelCase) was unknown, let's try other casing candidates
           if (unknownKey === "featuredImage") {
             payload.featuredimage = featuredImage;
           } else if (unknownKey === "featuredimage") {
@@ -190,18 +280,27 @@ export class Service {
             payload.image = featuredImage;
           } else if (unknownKey === "image") {
             payload.img = featuredImage;
+          } else if (unknownKey === "img") {
+            this.schemaKeys.featuredImage = undefined;
+            this.saveSchemaKeys();
           }
           
           if (unknownKey === "userId") {
             payload.userid = userId;
           } else if (unknownKey === "userid") {
             payload.user_id = userId;
+          } else if (unknownKey === "user_id") {
+            this.schemaKeys.userId = undefined;
+            this.saveSchemaKeys();
           }
           
           if (unknownKey === "author") {
             payload.authorName = author;
           } else if (unknownKey === "authorName") {
             payload.name = author;
+          } else if (unknownKey === "name") {
+            this.schemaKeys.author = undefined;
+            this.saveSchemaKeys();
           }
           
           continue; // Retry with modified payload
@@ -225,7 +324,6 @@ export class Service {
           continue; // Retry with modified payload
         }
 
-        // If it failed due to some other validation/authentication error, throw it directly
         throw error;
       }
     }
@@ -234,14 +332,17 @@ export class Service {
   }
 
   async updatePost(slug, { title, content, featuredImage, status }) {
-    console.log("Appwrite service :: updatePost :: Starting reactive update...", { slug, title, featuredImage, status });
+    console.log("Appwrite service :: updatePost :: Starting update...", { slug, title, featuredImage, status });
     
-    let payload = {
-      title,
-      content,
-      status,
-      featuredImage
-    };
+    let payload = { title, content };
+
+    // Apply cached featuredImage key or default to "featuredImage"
+    const imageKey = this.schemaKeys.featuredImage || "featuredImage";
+    payload[imageKey] = featuredImage;
+
+    // Apply status key
+    const statusKey = this.schemaKeys.status || "status";
+    payload[statusKey] = status;
 
     // Clean up undefined fields
     Object.keys(payload).forEach(key => {
@@ -263,7 +364,8 @@ export class Service {
           slug,
           payload
         );
-        console.log(`Appwrite service :: updatePost :: Update succeeded on attempt ${attempt}!`);
+        console.log(`Appwrite service :: updatePost :: Update succeeded!`);
+        this.updateSchemaCacheFromPayload(payload);
         return this.mapDocument(res);
       } catch (error) {
         const errorMsg = error?.message || "";
@@ -279,12 +381,12 @@ export class Service {
           const allowed = statusMatch[1].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
           console.log(`Appwrite service :: updatePost :: Status enum mismatch. Allowed values:`, allowed);
           
-          if (payload.status === "active") {
-            payload.status = allowed.includes("published") ? "published" : (allowed.includes("draft") ? "draft" : allowed[0]);
-          } else if (payload.status === "inactive") {
-            payload.status = allowed.includes("draft") ? "draft" : (allowed.includes("archived") ? "archived" : allowed[0]);
+          if (payload[statusKey] === "active") {
+            payload[statusKey] = allowed.includes("published") ? "published" : (allowed.includes("draft") ? "draft" : allowed[0]);
+          } else if (payload[statusKey] === "inactive") {
+            payload[statusKey] = allowed.includes("draft") ? "draft" : (allowed.includes("archived") ? "archived" : allowed[0]);
           } else {
-            payload.status = allowed[0];
+            payload[statusKey] = allowed[0];
           }
           continue;
         }
@@ -303,6 +405,9 @@ export class Service {
             payload.image = featuredImage;
           } else if (unknownKey === "image") {
             payload.img = featuredImage;
+          } else if (unknownKey === "img") {
+            this.schemaKeys.featuredImage = undefined;
+            this.saveSchemaKeys();
           }
           continue;
         }
@@ -398,7 +503,10 @@ export class Service {
       return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
     }
     try {
-      return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+      // Bypass Appwrite's restricted image transformation engine on Free regional tier by using getFileView
+      const url = this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}cb=${Date.now()}`;
     } catch (e) {
       console.warn("Appwrite service :: getFilePreview :: error", e);
       return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";

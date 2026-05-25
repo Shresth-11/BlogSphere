@@ -15,6 +15,7 @@ function PostCard({ $id, title, featuredImage, author }) {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
             onError={(e) => {
+              console.warn(`PostCard :: Failed to load featured image preview for file ID "${featuredImage}". If this returned a 403 Forbidden, ensure your Appwrite Storage Bucket has 'Public Read' permissions enabled in the Appwrite Console.`);
               e.target.onerror = null;
               e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
             }}

@@ -53,6 +53,7 @@ export default function Post() {
               alt={post.title}
               className="w-full h-full object-cover"
               onError={(e) => {
+                console.warn(`Post details :: Failed to load featured image for file ID "${post.featuredImage}". If this returned a 403 Forbidden, ensure your Appwrite Storage Bucket has 'Public Read' permissions enabled in the Appwrite Console.`);
                 e.target.onerror = null;
                 e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
               }}
