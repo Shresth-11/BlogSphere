@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 export default function Post() {
   const [post, setPost] = useState(null);
+  const [imgUrl, setImgUrl] = useState("");
   const { slug } = useParams();
   const navigate = useNavigate();
 
@@ -17,11 +18,27 @@ export default function Post() {
   useEffect(() => {
     if (slug) {
       appwriteService.getPost(slug).then((post) => {
-        if (post) setPost(post);
+        if (post) {
+          setPost(post);
+          setImgUrl(appwriteService.getFilePreview(post.featuredImage));
+        }
         else navigate("/");
       });
     } else navigate("/");
   }, [slug, navigate]);
+
+  const handleImageError = (e) => {
+    if (post) {
+      const rawUrl = appwriteService.getFileViewUrl(post.featuredImage);
+      if (imgUrl !== rawUrl) {
+        console.log(`Post details :: Preview failed. Falling back to raw file stream:`, rawUrl);
+        setImgUrl(rawUrl);
+      } else {
+        e.target.onerror = null;
+        e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+      }
+    }
+  };
 
   const deletePost = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -49,14 +66,10 @@ export default function Post() {
           {/* Hero Featured Image Banner */}
           <div className="w-full relative aspect-[16/9] rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={imgUrl}
               alt={post.title}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                console.warn(`Post details :: Failed to load featured image for file ID "${post.featuredImage}". If this returned a 403 Forbidden, ensure your Appwrite Storage Bucket has 'Public Read' permissions enabled in the Appwrite Console.`);
-                e.target.onerror = null;
-                e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
-              }}
+              onError={handleImageError}
             />
             {/* Visual gradient vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />

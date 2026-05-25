@@ -449,6 +449,9 @@ export class Service {
   async getPosts(queries = [Query.equal("status", "active")]) {
     try {
       const mappedQueries = queries.map(q => {
+        if (q && typeof q === "object" && q.attribute === "status") {
+          return Query.equal(this.schemaKeys.status || "status", ["active", "published"]);
+        }
         if (typeof q === "string") {
           // Rewrite status query to target both active and published statuses
           if (q.includes('equal("status", ["active"])') || q.includes('equal("status", "active")')) {
@@ -468,7 +471,30 @@ export class Service {
       }
       return res;
     } catch (error) {
-      console.log("Appwrite service :: getPosts :: error", error);
+      console.warn("Appwrite service :: getPosts :: Query failed (possibly due to missing indexes or permission issues). Falling back to fetching all documents and filtering in-memory.", error);
+      try {
+        const res = await this.databases.listDocuments(
+          conf.appwriteDatabaseId,
+          conf.appwriteCollectionId,
+          []
+        );
+        if (res && res.documents) {
+          let docs = res.documents.map((doc) => this.mapDocument(doc));
+          // Filter out inactive/draft posts if status query was requested
+          const hasStatusQuery = queries.some(q => {
+            if (q && typeof q === "object" && q.attribute === "status") return true;
+            if (typeof q === "string" && q.includes("status")) return true;
+            return false;
+          });
+          if (hasStatusQuery) {
+            docs = docs.filter(doc => doc.status === "active" || doc.status === "published");
+          }
+          res.documents = docs;
+          return res;
+        }
+      } catch (fallbackErr) {
+        console.error("Appwrite service :: getPosts :: Fallback also failed:", fallbackErr);
+      }
       return false;
     }
   }
@@ -503,12 +529,23 @@ export class Service {
       return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
     }
     try {
-      // Bypass Appwrite's restricted image transformation engine on Free regional tier by using getFileView
-      const url = this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
-      const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}cb=${Date.now()}`;
+      // High-speed compressed preview for ultra-fast page rendering (600x375 thumbnail)
+      return this.bucket.getFilePreview(conf.appwriteBucketId, fileId, 600, 375).toString();
     } catch (e) {
       console.warn("Appwrite service :: getFilePreview :: error", e);
+      return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+    }
+  }
+
+  getFileViewUrl(fileId) {
+    if (!fileId || typeof fileId !== "string" || fileId.trim() === "") {
+      return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
+    }
+    try {
+      // Direct raw file stream as a robust fallback bypassing the transformation engine
+      return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
+    } catch (e) {
+      console.warn("Appwrite service :: getFileViewUrl :: error", e);
       return "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
     }
   }
