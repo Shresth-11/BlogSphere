@@ -77,7 +77,7 @@ function Home() {
 
   useEffect(() => {
     setLoading(true);
-    appwriteService.getPosts().then((res) => {
+    appwriteService.getPosts([]).then((res) => {
       if (res && res.documents) {
         setPosts(res.documents);
       }

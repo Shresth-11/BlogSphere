@@ -449,13 +449,19 @@ export class Service {
   async getPosts(queries = [Query.equal("status", "active")]) {
     try {
       const mappedQueries = queries.map(q => {
-        if (q && typeof q === "object" && q.attribute === "status") {
-          return Query.equal(this.schemaKeys.status || "status", ["active", "published"]);
-        }
         if (typeof q === "string") {
-          // Rewrite status query to target both active and published statuses
-          if (q.includes('equal("status", ["active"])') || q.includes('equal("status", "active")')) {
-            return 'equal("status", ["active", "published"])';
+          try {
+            const parsed = JSON.parse(q);
+            if (parsed && parsed.attribute === "status") {
+              parsed.attribute = this.schemaKeys.status || "status";
+              parsed.values = ["active", "published"];
+              return JSON.stringify(parsed);
+            }
+          } catch (e) {
+            // Not a JSON string, fallback to standard string replacement
+            if (q.includes('equal("status", ["active"])') || q.includes('equal("status", "active")')) {
+              return 'equal("status", ["active", "published"])';
+            }
           }
         }
         return q;
@@ -482,8 +488,13 @@ export class Service {
           let docs = res.documents.map((doc) => this.mapDocument(doc));
           // Filter out inactive/draft posts if status query was requested
           const hasStatusQuery = queries.some(q => {
-            if (q && typeof q === "object" && q.attribute === "status") return true;
-            if (typeof q === "string" && q.includes("status")) return true;
+            if (typeof q === "string") {
+              if (q.includes("status")) return true;
+              try {
+                const parsed = JSON.parse(q);
+                if (parsed && parsed.attribute === "status") return true;
+              } catch (e) {}
+            }
             return false;
           });
           if (hasStatusQuery) {

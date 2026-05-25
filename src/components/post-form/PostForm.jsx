@@ -4,6 +4,7 @@ import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { compressImage } from "../../utils/imageCompressor";
 
 export default function PostForm({ post }) {
   const [error, setError] = useState("");
@@ -51,12 +52,14 @@ export default function PostForm({ post }) {
     setError("");
     try {
       if (post) {
+        let compressedFile = null;
         if (data.image[0]) {
           await appwriteService.deleteFile(post.featuredImage || post.$id);
+          compressedFile = await compressImage(data.image[0]);
         }
 
-        const file = data.image[0]
-          ? await appwriteService.uploadFile(data.image[0], post.$id)
+        const file = compressedFile
+          ? await appwriteService.uploadFile(compressedFile, post.$id)
           : null;
 
         if (data.image[0] && !file) {
@@ -73,7 +76,15 @@ export default function PostForm({ post }) {
         }
       } else {
         const slug = data.slug || getValues("slug") || slugTransform(data.title);
-        const file = await appwriteService.uploadFile(data.image[0], slug);
+        
+        let compressedFile = null;
+        if (data.image[0]) {
+          compressedFile = await compressImage(data.image[0]);
+        }
+
+        const file = compressedFile 
+          ? await appwriteService.uploadFile(compressedFile, slug)
+          : null;
 
         if (file) {
           const fileId = file.$id;

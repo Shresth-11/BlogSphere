@@ -19,7 +19,7 @@ function AllPosts() {
     <div className="w-full py-12">
       <Container>
         {/* Top Header Section */}
-        <div className="flex flex-col gap-2 mb-10 border-b border-zinc-900 pb-6">
+        <div className="flex flex-col items-start text-left gap-2 mb-10 border-b border-zinc-900 pb-6 w-full">
           <span className="text-xs font-semibold uppercase tracking-widest text-violet-400">
             Explore Content
           </span>
