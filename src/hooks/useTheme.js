@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem("blogsphere_theme");
-    if (savedTheme === "dark" || savedTheme === "light") {
-      return savedTheme;
+    try {
+      const savedTheme = localStorage.getItem("blogsphere_theme_v2");
+      if (savedTheme === "dark") {
+        return "dark";
+      }
+    } catch (e) {
+      console.error("useTheme error reading localStorage:", e);
     }
-    // Pure Light theme default
+    // Default to Light theme
     return "light";
   });
 
@@ -19,7 +23,11 @@ export function useTheme() {
       root.classList.remove("dark");
       root.classList.add("light");
     }
-    localStorage.setItem("blogsphere_theme", theme);
+    try {
+      localStorage.setItem("blogsphere_theme_v2", theme);
+    } catch (e) {
+      console.error("useTheme error setting localStorage:", e);
+    }
   }, [theme]);
 
   const toggleTheme = () => {

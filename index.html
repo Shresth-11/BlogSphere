@@ -1,10 +1,29 @@
 <!doctype html>
-<html lang="en" class="light" style="background-color: #f8fafc;">
+<html lang="en" class="light" style="background-color: #f8fafc; color-scheme: light;">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BlogSphere - Write, Connect, Inspire</title>
+    <!-- Force Light Theme default script before render -->
+    <script>
+      (function() {
+        try {
+          var userTheme = localStorage.getItem("blogsphere_theme_v2");
+          if (userTheme === "dark") {
+            document.documentElement.classList.add("dark");
+            document.documentElement.classList.remove("light");
+          } else {
+            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.add("light");
+            localStorage.setItem("blogsphere_theme_v2", "light");
+          }
+        } catch (e) {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
