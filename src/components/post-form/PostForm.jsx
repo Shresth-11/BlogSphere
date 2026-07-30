@@ -136,39 +136,34 @@ export default function PostForm({ post }) {
   }, [watch, slugTransform, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-6 py-6 w-full">
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-6 py-6 w-full select-none">
       
       {/* Dynamic Error Notification Banner */}
       {error && (
-        <div className="w-full p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm font-semibold flex flex-col gap-2 backdrop-blur-md text-left shadow-lg shadow-rose-950/20">
+        <div className="w-full p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-300 text-sm font-semibold flex flex-col gap-2 text-left shadow-md">
           <div className="flex items-start gap-3">
             <span className="text-lg leading-none mt-0.5">⚠️</span>
             <div className="flex flex-col gap-1">
-              <span className="text-white font-bold">Failed to publish article</span>
-              <span className="text-xs text-rose-300/80 leading-normal">{error}</span>
+              <span className="text-rose-900 dark:text-white font-bold">Failed to publish article</span>
+              <span className="text-xs text-rose-700/80 dark:text-rose-300/80 leading-normal">{error}</span>
             </div>
-          </div>
-          <div className="text-[10px] text-rose-400/80 border-t border-rose-500/25 pt-2 pl-8 flex flex-col gap-1">
-            <span className="font-bold uppercase tracking-wider text-rose-300">🔍 Diagnostics:</span>
-            <span>• Redux User State: {userData ? JSON.stringify(userData) : "null / undefined"}</span>
-            <span>• Resolved userId: {userData ? (userData.$id || userData.uid || userData.id || userData.userId || "NOT RESOLVED") : "NO USERDATA"}</span>
           </div>
         </div>
       )}
 
       <div className="flex flex-col lg:flex-row gap-8 w-full">
-        {/* Primary Left Form Column (Title, Slug, RTE Editor) */}
+        {/* Left Column (Title, Slug, RTE Editor) */}
         <div className="w-full lg:w-2/3 flex flex-col gap-6">
-          <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-6">
+          <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900/40 border border-slate-200/90 dark:border-zinc-800/80 shadow-md shadow-slate-200/50 dark:shadow-none backdrop-blur-sm flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <Input
                 label="Article Title"
                 placeholder="Enter a captivating title"
-                className={errors.title ? "border-rose-500/80 focus:ring-rose-500/10 bg-rose-950/5" : ""}
+                className={errors.title ? "border-rose-500 focus:ring-rose-500/10 bg-rose-50/50" : ""}
                 {...register("title", { required: "Article Title is required" })}
               />
               {errors.title && (
-                <span className="text-[11px] font-semibold text-rose-400 pl-1 block text-left">
+                <span className="text-[11px] font-semibold text-rose-500 pl-1 block text-left">
                   ⚠️ {errors.title.message}
                 </span>
               )}
@@ -178,7 +173,7 @@ export default function PostForm({ post }) {
               <Input
                 label="Slug / URL Path"
                 placeholder="slug-url-path"
-                className={errors.slug ? "border-rose-500/80 focus:ring-rose-500/10 bg-rose-950/5" : ""}
+                className={errors.slug ? "border-rose-500 focus:ring-rose-500/10 bg-rose-50/50" : ""}
                 {...register("slug", { 
                   required: "Slug/URL Path is required", 
                   maxLength: { value: 36, message: "URL Slug must be at most 36 characters long" } 
@@ -190,14 +185,14 @@ export default function PostForm({ post }) {
                 }}
               />
               {errors.slug && (
-                <span className="text-[11px] font-semibold text-rose-400 pl-1 block text-left">
+                <span className="text-[11px] font-semibold text-rose-500 pl-1 block text-left">
                   ⚠️ {errors.slug.message}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm">
+          <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900/40 border border-slate-200/90 dark:border-zinc-800/80 shadow-md shadow-slate-200/50 dark:shadow-none backdrop-blur-sm">
             <RTE
               label="Article Content"
               name="content"
@@ -209,42 +204,39 @@ export default function PostForm({ post }) {
 
         {/* Sidebar Right Column (Featured Image, Status, Action Button) */}
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
-          
-          {/* Settings Glass Panel */}
-          <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 backdrop-blur-sm flex flex-col gap-6">
+          <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900/40 border border-slate-200/90 dark:border-zinc-800/80 shadow-md shadow-slate-200/50 dark:shadow-none backdrop-blur-sm flex flex-col gap-6">
             
             <div className="flex flex-col gap-1.5 text-left">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 pl-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 pl-1">
                 Featured Image
               </span>
-              <div className={`relative group rounded-xl border bg-zinc-900/60 p-2 transition-all duration-300 ${errors.image ? "border-rose-500/80 hover:border-rose-600" : "border-zinc-800 hover:border-zinc-700"}`}>
+              <div className={`relative group rounded-xl border bg-slate-50 dark:bg-zinc-900/60 p-2 transition-all duration-300 ${errors.image ? "border-rose-500 hover:border-rose-600" : "border-slate-300 dark:border-zinc-800 hover:border-slate-400 dark:hover:border-zinc-700"}`}>
                 <input
                   type="file"
-                  className="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-500/10 file:text-violet-400 hover:file:bg-violet-500/20 file:cursor-pointer cursor-pointer"
+                  className="w-full text-xs text-slate-600 dark:text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 dark:file:bg-violet-500/10 file:text-indigo-600 dark:file:text-violet-400 hover:file:bg-indigo-100 dark:hover:file:bg-violet-500/20 file:cursor-pointer cursor-pointer"
                   accept="image/png, image/jpg, image/jpeg, image/gif"
                   {...register("image", { required: !post ? "Featured Image is required" : false })}
                 />
               </div>
               {errors.image && (
-                <span className="text-[11px] font-semibold text-rose-400 pl-1 block">
+                <span className="text-[11px] font-semibold text-rose-500 pl-1 block">
                   ⚠️ {errors.image.message}
                 </span>
               )}
             </div>
 
             {post && (
-              <div className="w-full rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 p-2 shadow-inner">
+              <div className="w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-950 p-2 shadow-inner">
                 <img
                   src={appwriteService.getFilePreview(post.featuredImage)}
                   alt={post.title}
                   className="w-full rounded-xl object-cover aspect-video"
                   onError={(e) => {
-                    console.warn(`PostForm :: Failed to load featured image preview for file ID "${post.featuredImage}". If this returned a 403 Forbidden, ensure your Appwrite Storage Bucket has 'Public Read' permissions enabled in the Appwrite Console.`);
                     e.target.onerror = null;
                     e.target.src = "https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?auto=format&fit=crop&w=1200&q=80";
                   }}
                 />
-                <span className="block text-center text-[10px] text-zinc-500 font-medium mt-2">
+                <span className="block text-center text-[10px] text-slate-500 dark:text-zinc-500 font-medium mt-2">
                   Current Featured Image
                 </span>
               </div>
@@ -258,8 +250,8 @@ export default function PostForm({ post }) {
 
             <Button
               type="submit"
-              bgColor={post ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/10 hover:shadow-emerald-500/20" : undefined}
-              className="w-full font-bold py-3 mt-2 cursor-pointer shadow-lg shadow-violet-500/25 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all"
+              bgColor={post ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-500/20" : undefined}
+              className="w-full font-bold py-3 mt-2 cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all"
               disabled={loading}
             >
               {loading ? (
@@ -277,7 +269,6 @@ export default function PostForm({ post }) {
               )}
             </Button>
           </div>
-
         </div>
       </div>
     </form>

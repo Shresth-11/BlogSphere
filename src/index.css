@@ -11,79 +11,116 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Adaptive */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
   background: #09090b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #cbd5e1;
   border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
   border: 2px solid #09090b;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
 
-/* Neon Gradient Text Utilities */
+/* Gradient Text Utilities */
 .text-gradient-purple {
-  background: linear-gradient(135deg, #a78bfa 0%, #6366f1 50%, #3b82f6 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-neon {
-  background: linear-gradient(135deg, #c084fc 0%, #6366f1 50%, #22d3ee 100%);
+.text-gradient-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Premium Glow Effects */
+/* Premium Light & Dark Glow Effects */
 .glow-purple {
+  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
+}
+
+.dark .glow-purple {
   box-shadow: 0 0 40px -10px rgba(139, 92, 246, 0.2);
 }
 
-.glow-cyan {
-  box-shadow: 0 0 40px -10px rgba(34, 211, 238, 0.2);
+.glow-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glow-hover:hover {
-  box-shadow: 0 0 50px -5px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
 }
 
-/* Glassmorphism Panel styles */
+/* Glassmorphism Panel styles - Theme Adaptive */
 .glass-panel {
-  background: rgba(18, 18, 24, 0.6);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(18, 18, 24, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(24, 24, 27, 0.4);
+  background: #ffffff;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e2e8f0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card:hover {
-  background: rgba(24, 24, 27, 0.6);
-  border-color: rgba(139, 92, 246, 0.3);
-  transform: translateY(-4px);
+.dark .glass-card {
+  background: rgba(24, 24, 27, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Rich Text Content Formatting Styles */
+.glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.15);
+}
+
+.dark .glass-card:hover {
+  background: rgba(24, 24, 27, 0.6);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 50px -5px rgba(99, 102, 241, 0.2);
+}
+
+/* Rich Text Article Formatting (Browser CSS) - Theme Adaptive */
 .browser-css {
-  color: #d4d4d8;
+  color: #334155;
   line-height: 1.8;
   font-size: 1.1rem;
+}
+
+.dark .browser-css {
+  color: #d4d4d8;
 }
 
 .browser-css p {
@@ -93,25 +130,37 @@
 .browser-css h1 {
   font-size: 2.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   margin-top: 2.5rem;
   margin-bottom: 1.25rem;
+}
+
+.dark .browser-css h1 {
+  color: #ffffff;
 }
 
 .browser-css h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f4f4f5;
+  color: #1e293b;
   margin-top: 2rem;
   margin-bottom: 1rem;
+}
+
+.dark .browser-css h2 {
+  color: #f4f4f5;
 }
 
 .browser-css h3 {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: #334155;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
+}
+
+.dark .browser-css h3 {
+  color: #e4e4e7;
 }
 
 .browser-css ul {
@@ -131,27 +180,45 @@
 }
 
 .browser-css blockquote {
-  border-left: 4px solid #8b5cf6;
-  background: rgba(139, 92, 246, 0.1);
+  border-left: 4px solid #6366f1;
+  background: #f1f5f9;
   padding: 1rem 1.5rem;
   border-radius: 0 8px 8px 0;
   margin-bottom: 1.5rem;
   font-style: italic;
+  color: #334155;
+}
+
+.dark .browser-css blockquote {
+  border-left: 4px solid #8b5cf6;
+  background: rgba(139, 92, 246, 0.1);
   color: #e4e4e7;
 }
 
 .browser-css img {
   border-radius: 12px;
   margin: 2rem auto;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dark .browser-css img {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .browser-css a {
-  color: #22d3ee;
+  color: #4f46e5;
   text-decoration: underline;
   transition: color 0.2s;
 }
 
+.dark .browser-css a {
+  color: #22d3ee;
+}
+
 .browser-css a:hover {
+  color: #7c3aed;
+}
+
+.dark .browser-css a:hover {
   color: #c084fc;
 }
