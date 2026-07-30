@@ -24,13 +24,16 @@ function Login() {
         navigate("/");
       }
     } catch (error) {
-      setError(error.message || "Something went wrong. Please check your credentials.");
+      const rawMsg = error?.message || "";
+      if (rawMsg.toLowerCase().includes("paused") || rawMsg.toLowerCase().includes("inactivity")) {
+        setError("Service is temporarily undergoing brief maintenance. Please try again in a few moments.");
+      } else {
+        setError(rawMsg || "Something went wrong. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  const isPaused = error && error.toLowerCase().includes("paused");
 
   return (
     <div className="flex items-center justify-center w-full min-h-[70vh] py-12 px-4 relative overflow-hidden select-none">
@@ -60,32 +63,11 @@ function Login() {
           </Link>
         </p>
 
-        {/* Inline Error messages */}
+        {/* Clean Public Error Alert */}
         {error && (
-          isPaused ? (
-            <div className="mt-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs text-left leading-relaxed flex flex-col gap-2">
-              <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300">
-                <span>⚠️</span>
-                <span>Appwrite Cloud Backend is Paused</span>
-              </div>
-              <p className="text-amber-800/90 dark:text-amber-300/90">
-                Your Appwrite project was automatically paused due to free-tier inactivity.
-              </p>
-              <a
-                href="https://cloud.appwrite.io"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 mt-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-colors shadow-xs"
-              >
-                <span>Open Appwrite Console to Unpause</span>
-                <span>&rarr;</span>
-              </a>
-            </div>
-          ) : (
-            <div className="mt-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 text-xs font-semibold text-center leading-relaxed">
-              ⚠️ {error}
-            </div>
-          )
+          <div className="mt-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 text-xs font-semibold text-center leading-relaxed">
+            ⚠️ {error}
+          </div>
         )}
 
         {/* Input Form Fields */}
