@@ -102,11 +102,11 @@ function Home() {
   });
 
   return (
-    <div className="w-full relative overflow-hidden pb-20 select-none bg-slate-50 dark:bg-zinc-950">
+    <div className="w-full relative overflow-hidden pb-20 select-none bg-slate-50 dark:bg-zinc-950 min-h-screen">
       <Container>
         {/* HERO HEADER SECTION */}
         {!authStatus ? (
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto py-12 sm:py-16 gap-6 px-4 relative z-10">
+          <div className="flex flex-col items-center text-center max-w-5xl mx-auto py-12 sm:py-20 gap-6 px-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm text-xs font-bold text-indigo-600 dark:text-violet-300">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
@@ -115,14 +115,14 @@ function Home() {
               ✨ The Modern Publishing Platform
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.12]">
               Write. Connect.<br />
               <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
                 Inspire the World.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-2xl leading-relaxed font-medium">
+            <p className="text-base sm:text-xl text-slate-600 dark:text-zinc-400 max-w-3xl leading-relaxed font-medium">
               Discover stories, technical guides, and design insights from global builders. BlogSphere is an ultra-clean, light-first publishing engine built with React & Appwrite.
             </p>
 
@@ -143,18 +143,18 @@ function Home() {
             </div>
 
             {/* Quick Hero Highlights Bar */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-6 pt-6 border-t border-slate-200 dark:border-zinc-800 text-xs font-semibold text-slate-500 dark:text-zinc-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 mt-8 pt-8 border-t border-slate-200 dark:border-zinc-800 text-xs sm:text-sm font-semibold text-slate-500 dark:text-zinc-400 w-full max-w-3xl">
               <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-sm">⚡</span>
+                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">⚡</span>
                 <span>Fast Appwrite Backend</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-sm">📝</span>
+                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">📝</span>
                 <span>Rich Text Editor</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-sm">🎨</span>
-                <span>Clean Editorial Light Theme</span>
+                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">🎨</span>
+                <span>Full-Width Editorial Light Theme</span>
               </div>
             </div>
           </div>
@@ -188,11 +188,11 @@ function Home() {
         )}
 
         {/* UNIFIED SEARCH & FILTER TOOLBAR CARD */}
-        <div className="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm mb-10 z-10 relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative w-full md:w-80">
+        <div className="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-sm mb-10 z-10 relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="relative w-full md:w-96">
             <input
               type="text"
-              placeholder="Search by title or author..."
+              placeholder="Search articles by title or author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2.5 pl-10 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-sm font-medium focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 transition-all"
@@ -302,8 +302,8 @@ function Home() {
               {/* FEATURED HIGHLIGHT */}
               {!searchQuery && <FeaturedPostCard post={filteredPosts[0]} />}
 
-              {/* ARTICLE CARDS GRID */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* ARTICLE CARDS GRID - Responsive 4 Column Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
                 {filteredPosts.map((post) => (
                   <div key={post.$id} className="w-full">
                     <PostCard {...post} />
