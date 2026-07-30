@@ -20,49 +20,49 @@ function FeaturedPostCard({ post }) {
   };
 
   return (
-    <div className="w-full rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-500">
+    <div className="w-full rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-300">
       <Link to={`/post/${post.$id}`} className="flex flex-col lg:flex-row w-full aspect-auto lg:aspect-[21/9] group">
         {/* Featured Image */}
         <div className="w-full lg:w-1/2 relative overflow-hidden bg-slate-100 dark:bg-zinc-950 aspect-video lg:aspect-auto">
           <img
             src={imgUrl}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             onError={handleImageError}
             loading="eager"
           />
           <div className="absolute top-4 left-4">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-700 dark:text-violet-300 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-indigo-200 dark:border-zinc-800 shadow-sm">
-              ⭐ Featured Article
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-zinc-300 bg-white/90 dark:bg-zinc-900/90 px-3 py-1 rounded-md border border-slate-200 dark:border-zinc-800 shadow-xs">
+              Featured
             </span>
           </div>
         </div>
 
         {/* Featured Content Info */}
         <div className="w-full lg:w-1/2 p-6 sm:p-10 flex flex-col justify-between gap-6 text-left bg-white dark:bg-zinc-900">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-              <span className="text-indigo-600 bg-indigo-50 dark:text-violet-400 dark:bg-violet-400/10 px-2.5 py-0.5 rounded-full border border-indigo-200 dark:border-violet-400/10">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
+              <span className="font-medium text-slate-700 dark:text-zinc-300">
                 Technology
               </span>
               <span>&bull;</span>
-              <span>5 Min Read</span>
+              <span>5 min read</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 dark:group-hover:text-violet-400 transition-colors duration-300 line-clamp-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white leading-snug group-hover:text-indigo-600 dark:group-hover:text-violet-400 transition-colors duration-200 line-clamp-3">
               {post.title}
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 border-t border-slate-100 dark:border-zinc-800 pt-6 mt-4">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white text-xs shadow-md">
+          <div className="flex items-center gap-3 border-t border-slate-100 dark:border-zinc-800 pt-5 mt-2">
+            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-slate-700 dark:text-zinc-300 text-xs">
               {post.author ? post.author.charAt(0).toUpperCase() : "W"}
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-slate-900 dark:text-zinc-200">
-                {post.author || "Anonymous Writer"}
+              <span className="text-xs font-semibold text-slate-900 dark:text-zinc-200">
+                {post.author || "Anonymous"}
               </span>
-              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
-                Published Recently
+              <span className="text-[11px] text-slate-500 dark:text-zinc-400">
+                Recently published
               </span>
             </div>
           </div>
@@ -82,7 +82,7 @@ function Home() {
   const userData = useSelector((state) => state.auth.userData);
   const navigate = useNavigate();
 
-  const categories = ["All", "Technology", "Design", "AI & Code", "Tutorials"];
+  const categories = ["All", "Technology", "Design", "Engineering", "Writing"];
 
   useEffect(() => {
     setLoading(true);
@@ -106,80 +106,50 @@ function Home() {
       <Container>
         {/* HERO HEADER SECTION */}
         {!authStatus ? (
-          <div className="flex flex-col items-center text-center max-w-5xl mx-auto py-12 sm:py-20 gap-6 px-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm text-xs font-bold text-indigo-600 dark:text-violet-300">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
-              </span>
-              ✨ The Modern Publishing Platform
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.12]">
-              Write. Connect.<br />
-              <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
-                Inspire the World.
-              </span>
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto py-12 sm:py-20 gap-5 px-4 relative z-10">
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+              Stories, insights, and ideas for curious minds.
             </h1>
 
-            <p className="text-base sm:text-xl text-slate-600 dark:text-zinc-400 max-w-3xl leading-relaxed font-medium">
-              Discover stories, technical guides, and design insights from global builders. BlogSphere is an ultra-clean, light-first publishing engine built with React & Appwrite.
+            <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-xl leading-relaxed font-normal">
+              A space for writers and builders to share what they&apos;re learning, building, and thinking about.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
+            <div className="flex items-center justify-center gap-3 mt-3">
               <button
                 onClick={() => navigate("/signup")}
-                className="px-8 py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                className="px-6 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-xl transition-all duration-200 cursor-pointer shadow-xs"
               >
-                Start Writing Free
+                Start Writing
               </button>
               <button
                 onClick={() => navigate("/login")}
-                className="px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-slate-900 dark:text-zinc-300 dark:hover:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 hover:border-slate-400 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-sm transition-all duration-200 cursor-pointer"
+                className="px-6 py-3 text-sm font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-200/70 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-800 rounded-xl transition-all duration-200 cursor-pointer"
               >
                 Sign In
               </button>
             </div>
-
-            {/* Quick Hero Highlights Bar */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 mt-8 pt-8 border-t border-slate-200 dark:border-zinc-800 text-xs sm:text-sm font-semibold text-slate-500 dark:text-zinc-400 w-full max-w-3xl">
-              <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">⚡</span>
-                <span>Fast Appwrite Backend</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">📝</span>
-                <span>Rich Text Editor</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-indigo-600 dark:text-violet-400 font-extrabold text-base">🎨</span>
-                <span>Full-Width Editorial Light Theme</span>
-              </div>
-            </div>
           </div>
         ) : (
-          <div className="relative overflow-hidden my-8 p-8 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm z-10">
+          <div className="relative overflow-hidden my-8 p-8 sm:p-10 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs z-10">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="text-left">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-violet-400 bg-indigo-50 dark:bg-violet-500/10 px-3 py-1 rounded-full border border-indigo-200 dark:border-violet-500/10">
-                  Creator Hub
-                </span>
-                <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-4 leading-tight">
-                  Welcome back, {userData?.name || "Writer"}! 👋
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
+                  Welcome back, {userData?.name || "Writer"}
                 </h1>
-                <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base mt-2 max-w-lg leading-relaxed font-medium">
-                  Ready to publish your next piece? Draft your article and share it instantly with the community.
+                <p className="text-slate-600 dark:text-zinc-400 text-sm mt-1 max-w-md">
+                  Have something to share today? Start a new post anytime.
                 </p>
               </div>
               <div>
                 <Link
                   to="/add-post"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 rounded-xl transition-all duration-200 cursor-pointer"
                 >
-                  <span>Create New Post</span>
+                  <span>New Post</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                   </svg>
                 </Link>
               </div>
@@ -187,18 +157,18 @@ function Home() {
           </div>
         )}
 
-        {/* UNIFIED SEARCH & FILTER TOOLBAR CARD */}
-        <div className="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-sm mb-10 z-10 relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative w-full md:w-96">
+        {/* SEARCH & FILTER BAR */}
+        <div className="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-3 sm:p-4 shadow-xs mb-10 z-10 relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="relative w-full md:w-80">
             <input
               type="text"
-              placeholder="Search articles by title or author..."
+              placeholder="Search articles..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2.5 pl-10 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-sm font-medium focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+              className="w-full px-4 py-2 pl-9 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-sm font-medium focus:outline-none focus:bg-white focus:border-slate-400 transition-all"
             />
             <svg
-              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -208,7 +178,7 @@ function Home() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:text-zinc-500"
               >
                 ✕
               </button>
@@ -216,15 +186,15 @@ function Home() {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm"
-                    : "bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold"
+                    : "text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 }`}
               >
                 {cat}
@@ -233,76 +203,63 @@ function Home() {
           </div>
         </div>
 
-        {/* MAIN ARTICLES GRID */}
+        {/* ARTICLES GRID */}
         <div className="flex flex-col gap-8 relative z-10">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-4">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
-              <span className="text-indigo-600 dark:text-violet-400 text-lg">📰</span> Latest Articles
-              {searchQuery && (
-                <span className="text-xs font-normal text-slate-500 dark:text-zinc-400 ml-2">
-                  (Found {filteredPosts.length} results)
-                </span>
-              )}
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-4 text-left">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              Recent Articles
             </h2>
             <Link
               to="/all-posts"
-              className="text-xs sm:text-sm font-bold text-indigo-600 dark:text-violet-400 hover:text-indigo-700 dark:hover:text-violet-300 transition-colors flex items-center gap-1.5 group"
+              className="text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
-              <span>Explore All</span>
-              <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+              View all &rarr;
             </Link>
           </div>
 
           {loading ? (
-            /* Skeleton Loading Grid */
-            <div className="flex flex-col gap-10">
-              <div className="w-full aspect-[21/9] rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-8 flex flex-col lg:flex-row gap-6 animate-pulse">
-                <div className="w-full lg:w-1/2 rounded-2xl bg-slate-200 dark:bg-zinc-800 aspect-video lg:aspect-auto" />
+            <div className="flex flex-col gap-8">
+              <div className="w-full aspect-[21/9] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-8 flex flex-col lg:flex-row gap-6 animate-pulse">
+                <div className="w-full lg:w-1/2 rounded-xl bg-slate-100 dark:bg-zinc-800 aspect-video lg:aspect-auto" />
                 <div className="w-full lg:w-1/2 flex flex-col justify-between py-4">
                   <div className="flex flex-col gap-4">
-                    <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded-md w-1/4" />
-                    <div className="h-8 bg-slate-200 dark:bg-zinc-800 rounded-md w-3/4" />
+                    <div className="h-4 bg-slate-100 dark:bg-zinc-800 rounded-md w-1/4" />
+                    <div className="h-8 bg-slate-100 dark:bg-zinc-800 rounded-md w-3/4" />
                   </div>
-                  <div className="h-10 bg-slate-200 dark:bg-zinc-800 rounded-md w-1/3 mt-6" />
+                  <div className="h-10 bg-slate-100 dark:bg-zinc-800 rounded-md w-1/3 mt-6" />
                 </div>
               </div>
             </div>
           ) : filteredPosts.length === 0 ? (
-            /* Empty State */
-            <div className="w-full py-20 text-center rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 border-dashed shadow-sm px-6">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-2xl">
-                📭
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
-                {searchQuery ? `No articles matching "${searchQuery}"` : "No articles found"}
+            <div className="w-full py-16 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-6">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+                {searchQuery ? `No articles matching "${searchQuery}"` : "No articles published yet"}
               </h3>
-              <p className="text-slate-500 dark:text-zinc-400 text-sm max-w-sm mx-auto mb-6">
+              <p className="text-slate-500 dark:text-zinc-400 text-xs max-w-xs mx-auto mb-4">
                 {searchQuery
-                  ? "Try searching for a different title or clear the filter."
-                  : "Be the pioneer and draft the very first article!"}
+                  ? "Try searching for another topic."
+                  : "Write the first article to get started."}
               </p>
               {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="px-6 py-2.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all"
+                  className="px-4 py-2 text-xs font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
                 >
-                  Clear Search Filter
+                  Clear search
                 </button>
               ) : (
                 <Link
                   to="/add-post"
-                  className="inline-flex px-6 py-3 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all"
+                  className="inline-flex px-4 py-2 text-xs font-semibold text-white bg-slate-900 rounded-lg"
                 >
-                  Add the First Post
+                  New Post
                 </Link>
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-10">
-              {/* FEATURED HIGHLIGHT */}
+            <div className="flex flex-col gap-8">
               {!searchQuery && <FeaturedPostCard post={filteredPosts[0]} />}
 
-              {/* ARTICLE CARDS GRID - Responsive 4 Column Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
                 {filteredPosts.map((post) => (
                   <div key={post.$id} className="w-full">

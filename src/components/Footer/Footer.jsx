@@ -4,106 +4,77 @@ import Logo from "../Logo";
 
 function Footer() {
   return (
-    <footer className="w-full border-t border-slate-200 dark:border-zinc-900 bg-slate-100/70 dark:bg-zinc-950/60 backdrop-blur-md py-12 mt-20 relative overflow-hidden transition-colors duration-300">
-      {/* Decorative Glow */}
-      <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-indigo-500/5 dark:bg-violet-600/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-cyan-500/5 dark:bg-cyan-600/5 blur-[120px] pointer-events-none" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
+    <footer className="w-full border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-12 mt-20 relative transition-colors duration-300">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-8 lg:px-12">
         <div className="-m-6 flex flex-wrap justify-between">
           
           {/* Logo and Copyright Column */}
-          <div className="w-full p-6 md:w-1/2 lg:w-4/12 flex flex-col justify-between gap-6">
-            <div className="flex flex-col gap-4">
+          <div className="w-full p-6 md:w-1/2 lg:w-4/12 flex flex-col justify-between gap-6 text-left">
+            <div className="flex flex-col gap-3">
               <div className="inline-flex items-center">
                 <Logo />
               </div>
               <p className="text-sm text-slate-600 dark:text-zinc-400 max-w-xs leading-relaxed">
-                Empowering writers, designers, and developers to share their stories with the world. Built with Appwrite and React.
+                An open platform for articles, tutorials, and personal stories.
               </p>
             </div>
             <div>
               <p className="text-xs text-slate-500 dark:text-zinc-500 font-medium">
-                &copy; Copyright {new Date().getFullYear()}. All Rights Reserved by BlogSphere.
+                &copy; {new Date().getFullYear()} BlogSphere. All rights reserved.
               </p>
             </div>
           </div>
           
           {/* Menu Columns */}
-          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12">
-            <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500">
-              Company
+          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12 text-left">
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+              Platform
             </h3>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-2.5">
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Features
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Pricing
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/all-posts">
+                  Articles
                 </Link>
               </li>
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Affiliate Program
-                </Link>
-              </li>
-              <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Press Kit
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/add-post">
+                  Write a Post
                 </Link>
               </li>
             </ul>
           </div>
           
-          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12">
-            <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500">
-              Support
+          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12 text-left">
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+              Account
             </h3>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-2.5">
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Account
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/login">
+                  Sign In
                 </Link>
               </li>
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Customer Support
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/signup">
+                  Create Account
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12">
-            <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500">
-              Legals
+          <div className="w-full p-6 sm:w-1/2 md:w-1/4 lg:w-2/12 text-left">
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+              Legal
             </h3>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-2.5">
               <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Terms &amp; Conditions
-                </Link>
-              </li>
-              <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200" to="/">
-                  Licensing
+                <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors" to="/">
+                  Terms &amp; Privacy
                 </Link>
               </li>
             </ul>
