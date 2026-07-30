@@ -27,17 +27,17 @@ function App() {
   }, [dispatch]);
 
   return !loading ? (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(99,102,241,0.08),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] flex flex-col justify-between transition-colors duration-300">
+    <div className="w-full min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-300">
       <div className="w-full">
         <Header theme={theme} toggleTheme={toggleTheme} />
-        <main className="min-h-[70vh]">
+        <main className="w-full min-h-[70vh]">
           <Outlet />
         </main>
       </div>
       <Footer />
     </div>
   ) : (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col justify-center items-center gap-4 text-slate-800 dark:text-zinc-100 selection:bg-indigo-500 selection:text-white transition-colors duration-300">
+    <div className="w-full min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col justify-center items-center gap-4 text-slate-800 dark:text-zinc-100 selection:bg-indigo-500 selection:text-white transition-colors duration-300">
       {/* Pulsing Spinner */}
       <div className="relative w-16 h-16 flex items-center justify-center">
         <div className="absolute w-full h-full rounded-full border-4 border-indigo-500/20 dark:border-violet-500/20"></div>

@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
-/* Custom variant rule for Tailwind CSS v4 to enforce class-based dark mode (prevents OS prefers-color-scheme from forcing dark mode) */
+/* Custom variant rule for Tailwind CSS v4 to enforce class-based dark mode */
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  html {
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc;
     color: #0f172a;
   }
   
-  html.dark {
+  html.dark, html.dark body {
     background-color: #09090b;
     color: #f4f4f5;
   }
@@ -61,18 +65,11 @@
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-purple {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Glassmorphism & Elevation Panels */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
 .dark .glass-panel {
@@ -82,8 +79,6 @@
 
 .glass-card {
   background: #ffffff;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
