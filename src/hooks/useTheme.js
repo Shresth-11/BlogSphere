@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("blogsphere_theme");
-    if (savedTheme) {
+    if (savedTheme === "dark" || savedTheme === "light") {
       return savedTheme;
     }
-    // Default to light theme as requested
+    // Pure Light theme default
     return "light";
   });
 
@@ -16,8 +16,8 @@ export function useTheme() {
       root.classList.add("dark");
       root.classList.remove("light");
     } else {
-      root.classList.add("light");
       root.classList.remove("dark");
+      root.classList.add("light");
     }
     localStorage.setItem("blogsphere_theme", theme);
   }, [theme]);
